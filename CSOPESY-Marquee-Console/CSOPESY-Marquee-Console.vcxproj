@@ -128,6 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CSOPESY-Marquee-Console.cpp" />
+    <ClCompile Include="MarqueeConsole.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MarqueeConsole.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,5 +18,13 @@
     <ClCompile Include="CSOPESY-Marquee-Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MarqueeConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MarqueeConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
