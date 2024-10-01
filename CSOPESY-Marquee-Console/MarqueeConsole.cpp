@@ -2,25 +2,44 @@
 
 
 
-MarqueeConsole::MarqueeConsole() {
+MarqueeConsole::MarqueeConsole(String name) {
+	this->name = name;
+
     hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // Initialize hConsole
 	GetConsoleScreenBufferInfo(hConsole, &csbi); // Initialize csbi
+}
+
+MarqueeConsole::~MarqueeConsole() {
+}
+
+// Enable the marquee console
+void MarqueeConsole::onEnable() {
+	this->running = true;
 
     // Disable the cursor
     CONSOLE_CURSOR_INFO cursorInfo;
     GetConsoleCursorInfo(hConsole, &cursorInfo);
-    cursorInfo.bVisible = FALSE; // Set the cursor visibility to false
+    cursorInfo.bVisible = false; // Set the cursor visibility to false
     SetConsoleCursorInfo(hConsole, &cursorInfo);
 
     // Start the cursor blinking thread
     cursorThread = std::thread(&MarqueeConsole::toggleCursorVisibility, this);
 }
 
-MarqueeConsole::~MarqueeConsole() {
-    running = false;
-    if (cursorThread.joinable()) {
-        cursorThread.join();
-    }
+// Disable the marquee console
+void MarqueeConsole::onDisable() {
+	this->running = false;
+
+	// Enable the cursor
+	CONSOLE_CURSOR_INFO cursorInfo;
+	GetConsoleCursorInfo(hConsole, &cursorInfo);
+	cursorInfo.bVisible = true; // Set the cursor visibility to true
+	SetConsoleCursorInfo(hConsole, &cursorInfo);
+
+	// Stop the cursor blinking thread
+	if (cursorThread.joinable()) {
+		cursorThread.join();
+	}
 }
 
 // Keyboard Polling
@@ -53,7 +72,7 @@ void MarqueeConsole::pollKeyboard(bool threading) {
             }
             else if (key == 13) { // Enter key
                 currentCommand.push_back('\0');
-                commandHistory.push_back(std::string(currentCommand.data()));
+                commandHistory.push_back(String(currentCommand.data()));
                 currentCommand.clear();
                 currentCursorPosition = 0;
             }
@@ -131,10 +150,10 @@ void MarqueeConsole::printHeader() {
 void MarqueeConsole::printMarquee() {
     for (int i = 0; i < marqueeHeight; i++) {
         if (i == marqueeY) {
-            std::cout << std::string(marqueeX, ' ') << marqueeText << std::string((marqueeWidth - (marqueeX + marqueeTextSize)), ' ') << std::endl;
+            std::cout << String(marqueeX, ' ') << marqueeText << String((marqueeWidth - (marqueeX + marqueeTextSize)), ' ') << std::endl;
         }
         else {
-            std::cout << std::string(marqueeWidth, ' ') << std::endl;
+            std::cout << String(marqueeWidth, ' ') << std::endl;
         }
     }
 }
@@ -147,7 +166,7 @@ void MarqueeConsole::printCurrentCommand() {
     SetConsoleCursorPosition(hConsole, cursorPos);
 
     // Clear the current command line
-    std::cout << std::string(csbi.dwSize.X, ' ');
+    std::cout << String(csbi.dwSize.X, ' ');
 
     // Move the cursor back to the beginning of the current command line
     SetConsoleCursorPosition(hConsole, cursorPos);
@@ -184,7 +203,7 @@ void MarqueeConsole::toggleCursorVisibility() {
 }
 
 void MarqueeConsole::printCommandHistory() {
-    for (const std::string& command : commandHistory) {
+    for (const String& command : commandHistory) {
         std::cout << "Command processed in MARQUEE_CONSOLE: " << command;
 
 		// If not the last command, add a newline

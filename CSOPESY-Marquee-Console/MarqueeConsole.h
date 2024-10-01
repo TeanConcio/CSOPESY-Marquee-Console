@@ -10,13 +10,19 @@
 
 
 
+typedef std::string String;
+
 class MarqueeConsole
 {
 public:
-	MarqueeConsole();
+	MarqueeConsole(String name);
 	~MarqueeConsole();
 
-	bool running = true;
+	String name;
+	bool running = false;
+
+	void onEnable();
+	void onDisable();
 
 	void pollKeyboard(bool threading);
 	void process();
@@ -36,15 +42,15 @@ private:
 	int marqueeXSpd = 1;
 	int marqueeYSpd = 1;
 
-	std::string marqueeText = "Hello World";
+	String marqueeText = "Hello world in marquee!";
 	int marqueeTextSize = marqueeText.length();
 	int marqueeX = 0;
 	int marqueeY = 0;
 
-	std::string commandPrompt = "Enter a command for MARQUEE_CONSOLE: ";
+	String commandPrompt = "Enter a command for MARQUEE_CONSOLE: ";
 	int commandPromptSize = commandPrompt.length();
 	int currentCursorPosition = 0;
-	std::vector<std::string> commandHistory;
+	std::vector<String> commandHistory;
 	std::vector<char> currentCommand;
 
 	bool cursorVisible = true;
