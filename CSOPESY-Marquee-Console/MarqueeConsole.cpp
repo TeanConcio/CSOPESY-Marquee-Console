@@ -88,7 +88,11 @@ void MarqueeConsole::pollKeyboard(bool threading) {
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(MarqueeConsole::POLLING_DELAY));
+		// If threading is enabled, sleep for a short delay
+        if (threading)
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(MarqueeConsole::POLLING_DELAY)
+            );
     } while (running && threading);
 }
 
@@ -110,6 +114,30 @@ void MarqueeConsole::process() {
 }
 
 void MarqueeConsole::display() {
+    // Get the current cursor position and screen buffer size
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    COORD cursorPos = csbi.dwCursorPosition;
+    SHORT screenHeight = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    bool screenFits = false;
+
+    // Check if the outputs fit on the screen
+    if (this->marqueeHeight + this->commandHistory.size() + 5 < screenHeight
+        && false
+    ) {
+        // Move the cursor to the beginning of the console
+        cursorPos.X = 0;
+        cursorPos.Y = 0;
+        SetConsoleCursorPosition(hConsole, cursorPos);
+
+		screenFits = true;
+    }
+    else {
+        // Clear the console
+        system("cls");
+
+		screenFits = false;
+    }
+
     // Print the new output
     printHeader();
     printMarquee();
@@ -119,26 +147,14 @@ void MarqueeConsole::display() {
     printCurrentCommand();
     printCommandHistory();
 
-    // Get the current cursor position and screen buffer size
-    GetConsoleScreenBufferInfo(hConsole, &csbi);
-    COORD cursorPos = csbi.dwCursorPosition;
-    SHORT screenHeight = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	// Wait for a short delay before refreshing the display
+    std::this_thread::sleep_for(std::chrono::milliseconds(MarqueeConsole::REFRESH_DELAY));
 
-    // Check if the outputs fit on the screen
-    if (this->marqueeHeight + this->commandHistory.size() + 5 <= screenHeight) {
-        // Move the cursor to the beginning of the console
-        cursorPos.X = 0;
-        cursorPos.Y = 0;
-        SetConsoleCursorPosition(hConsole, cursorPos);
-
-		// Wait for a short delay before refreshing the display, add more delay because the console is not cleared
-        std::this_thread::sleep_for(std::chrono::milliseconds((MarqueeConsole::REFRESH_DELAY + 1) * 50 / (MarqueeConsole::REFRESH_DELAY + 1)));
-    }
-    else {
-        // Clear the console
-        system("cls");
-        std::this_thread::sleep_for(std::chrono::milliseconds(MarqueeConsole::REFRESH_DELAY));
-    }
+	// If screen fits, add more delay because the console is not cleared
+	if (screenFits)
+		std::this_thread::sleep_for(std::chrono::milliseconds(
+            (MarqueeConsole::REFRESH_DELAY + 1) * 25 / (MarqueeConsole::REFRESH_DELAY + 1)
+        ));
 }
 
 void MarqueeConsole::printHeader() {
@@ -150,7 +166,11 @@ void MarqueeConsole::printHeader() {
 void MarqueeConsole::printMarquee() {
     for (int i = 0; i < marqueeHeight; i++) {
         if (i == marqueeY) {
-            std::cout << String(marqueeX, ' ') << marqueeText << String((marqueeWidth - (marqueeX + marqueeTextSize)), ' ') << std::endl;
+            std::cout << 
+                String(marqueeX, ' ') << 
+                marqueeText << 
+                String((marqueeWidth - (marqueeX + marqueeTextSize)), ' ') << 
+                std::endl;
         }
         else {
             std::cout << String(marqueeWidth, ' ') << std::endl;

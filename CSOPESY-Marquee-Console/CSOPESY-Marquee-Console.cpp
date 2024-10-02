@@ -1,10 +1,11 @@
 #include "MarqueeConsole.h"
 
 
-const bool THREADING = false;
+const bool THREADING = true;
 
 int main() {
-	const std::shared_ptr<MarqueeConsole> marqueeConsole = std::make_shared<MarqueeConsole>("MARQUEE_CONSOLE");
+	const std::shared_ptr<MarqueeConsole> marqueeConsole = 
+		std::make_shared<MarqueeConsole>("MARQUEE_CONSOLE");
 
 	marqueeConsole->onEnable();
 
@@ -12,7 +13,7 @@ int main() {
 		// Start the keyboard polling in a separate thread using a lambda
 		std::thread keyboardThread([&marqueeConsole]() {
 			marqueeConsole->pollKeyboard(true);
-			});
+		});
 
 		while (marqueeConsole->running) { // Loop to keep updating the display
 			marqueeConsole->process();

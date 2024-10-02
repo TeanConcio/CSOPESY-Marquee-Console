@@ -31,8 +31,8 @@ public:
 
 
 private:
-	static const int REFRESH_DELAY = 1;
-	static const int POLLING_DELAY = 1;
+	static const int REFRESH_DELAY = 50;
+	static const int POLLING_DELAY = 50;
 
 	HANDLE hConsole; // Console handle
 	CONSOLE_SCREEN_BUFFER_INFO csbi; // Console screen buffer info
